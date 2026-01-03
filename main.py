@@ -105,17 +105,35 @@ async def health_check():
         raise HTTPException(status_code=500, detail="Models not loaded")
     return {"status": "healthy", "models_loaded": True}
 
+@app.post("/debug")
+async def debug_endpoint(passenger: TitanicPassenger):
+    """Debug endpoint to test data reception"""
+    try:
+        return {
+            "received_data": passenger.dict(),
+            "data_types": {k: type(v).__name__ for k, v in passenger.dict().items()},
+            "feature_columns": feature_columns,
+            "status": "debug successful"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Debug error: {str(e)}")
+
 @app.post("/predict/decision-tree")
 async def predict_decision_tree(passenger: TitanicPassenger):
     if dt_model is None:
         raise HTTPException(status_code=500, detail="Decision Tree model not loaded")
     
     try:
+        # Debug: Print received data
+        print(f"Received data: {passenger}")
+        
         # Preprocess input
         df = preprocess_input(passenger)
+        print(f"Preprocessed data: {df}")
         
         # Scale features
         scaled_features = scaler.transform(df)
+        print(f"Scaled features shape: {scaled_features.shape}")
         
         # Make prediction
         prediction = dt_model.predict(scaled_features)[0]
@@ -129,6 +147,7 @@ async def predict_decision_tree(passenger: TitanicPassenger):
             "message": "Survived" if prediction == 1 else "Did not survive"
         }
     except Exception as e:
+        print(f"Error in prediction: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Prediction error: {str(e)}")
 
 @app.post("/predict/logistic-regression")
