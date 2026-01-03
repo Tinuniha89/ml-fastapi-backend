@@ -5,6 +5,3 @@ SibSp
 Parch
 Fare
 Embarked
-FamilySize
-IsAlone
-AgeGroup

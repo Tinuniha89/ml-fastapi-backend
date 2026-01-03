@@ -52,24 +52,7 @@ except Exception as e:
 def preprocess_input(passenger: TitanicPassenger) -> pd.DataFrame:
     """Preprocess input data to match training format"""
     
-    # Calculate derived features if not provided
-    if passenger.family_size is None:
-        passenger.family_size = passenger.sibsp + passenger.parch + 1
-    
-    if passenger.is_alone is None:
-        passenger.is_alone = 1 if passenger.family_size == 1 else 0
-    
-    if passenger.age_group is None:
-        if passenger.age <= 12:
-            passenger.age_group = 0
-        elif passenger.age <= 18:
-            passenger.age_group = 1
-        elif passenger.age <= 60:
-            passenger.age_group = 2
-        else:
-            passenger.age_group = 3
-    
-    # Create DataFrame with all features
+    # Create DataFrame with original features only
     data = {
         'Pclass': passenger.pclass,
         'Sex': passenger.sex,
@@ -77,10 +60,7 @@ def preprocess_input(passenger: TitanicPassenger) -> pd.DataFrame:
         'SibSp': passenger.sibsp,
         'Parch': passenger.parch,
         'Fare': passenger.fare,
-        'Embarked': passenger.embarked,
-        'FamilySize': passenger.family_size,
-        'IsAlone': passenger.is_alone,
-        'AgeGroup': passenger.age_group
+        'Embarked': passenger.embarked
     }
     
     df = pd.DataFrame([data])
